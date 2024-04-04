@@ -1,40 +1,55 @@
 import * as vscode from "vscode";
+const util = require("node:util");
+
 import cp from "child_process";
 import path from "path";
+import fs from "fs";
+
+const exec = util.promisify(cp.exec);
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "generate-jest-mocks.generateJestMocks",
       async () => {
-        const editor = vscode.window.activeTextEditor;
+        try {
+          const editor = vscode.window.activeTextEditor;
 
-        if (typeof editor === "undefined") {
-          vscode.window.showInformationMessage(`No editor is active`);
-
-          return;
-        }
-
-        const filePath =
-          path.dirname(editor.document.uri.fsPath) +
-          "/" +
-          path.basename(editor.document.uri.fsPath).replace(".test.js", ".ts");
-
-        vscode.window.showInformationMessage(`generate mocks ${filePath}`);
-
-        // run git status
-        cp.exec(`generate-jest-mocks ${filePath}`, (error, stdout, stderr) => {
-          if (error) {
-            console.error("Error running git status: " + error.message);
-            vscode.window.showErrorMessage(error.message);
+          if (typeof editor === "undefined") {
+            vscode.window.showInformationMessage(`No editor is active`);
 
             return;
           }
 
-          const snippets = new vscode.SnippetString(`${stdout}$0`);
+          const testFilePath = editor.document.uri.fsPath;
+
+          const srcFilePath = [".js", ".ts", ".tsx", ".jsx"].reduce(
+            (memo, ext) => {
+              const tmpFilePath = `${path.dirname(testFilePath)}/${path
+                .basename(testFilePath)
+                .replace(/\.test\.(?=[^.]+$).*/, ext)}`;
+
+              if (fs.existsSync(tmpFilePath)) {
+                return tmpFilePath;
+              }
+
+              return memo;
+            }
+          );
+
+          const output = await exec(`generate-jest-mocks ${srcFilePath}`);
+
+          if (output.stderr) {
+            throw new Error(output.stderr);
+          }
+
+          const snippets = new vscode.SnippetString(`${output.stdout}$0`);
 
           editor.insertSnippet(snippets);
-        });
+        } catch (error: any) {
+          console.error(error);
+          vscode.window.showErrorMessage(error.message);
+        }
       }
     )
   );
