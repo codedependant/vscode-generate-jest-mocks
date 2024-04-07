@@ -5,9 +5,11 @@ import cp from "child_process";
 import path from "path";
 import fs from "fs";
 
+import generateJestMocks from "generate-jest-mocks";
+
 const exec = util.promisify(cp.exec);
 
-async function generate({ flags }: { flags?: string } = {}) {
+async function generate({ automock }: { automock?: boolean } = {}) {
   try {
     const editor = vscode.window.activeTextEditor;
 
@@ -31,14 +33,11 @@ async function generate({ flags }: { flags?: string } = {}) {
       return memo;
     });
 
-    const command = `generate-jest-mocks ${flags} ${srcFilePath}`;
-    const output = await exec(command);
+    const file = await vscode.workspace.openTextDocument(srcFilePath);
+    console.log("generate : file.getText():", file.getText());
+    const output = generateJestMocks(file.getText(), { automock });
 
-    if (output.stderr) {
-      throw new Error(output.stderr);
-    }
-
-    const snippets = new vscode.SnippetString(`${output.stdout}$0`);
+    const snippets = new vscode.SnippetString(`${output}$0`);
 
     editor.insertSnippet(snippets);
   } catch (error: any) {
@@ -58,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "generate-jest-mocks.generateJestAutoMocks",
-      async () => generate({ flags: "-a" })
+      async () => generate({ automock: true })
     )
   );
 }
