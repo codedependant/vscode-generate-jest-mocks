@@ -21,17 +21,25 @@ async function generate({ automock }: { automock?: boolean } = {}) {
 
     const testFilePath = editor.document.uri.fsPath;
 
-    const srcFilePath = [".js", ".ts", ".tsx", ".jsx"].reduce((memo, ext) => {
-      const tmpFilePath = `${path.dirname(testFilePath)}/${path
-        .basename(testFilePath)
-        .replace(/\.test\.(?=[^.]+$).*/, ext)}`;
+    const srcFilePath = [".js", ".ts", ".tsx", ".jsx"].reduce(
+      (memo: string | undefined, ext: string) => {
+        const tmpFilePath = `${path.dirname(testFilePath)}/${path
+          .basename(testFilePath)
+          .replace(/\.test\.(?=[^.]+$).*/, ext)}`;
 
-      if (fs.existsSync(tmpFilePath)) {
-        return tmpFilePath;
-      }
+        if (fs.existsSync(tmpFilePath)) {
+          return tmpFilePath;
+        }
 
-      return memo;
-    });
+        return memo;
+      },
+      undefined
+    );
+
+    console.log("srcFilePath : srcFilePath:", srcFilePath);
+    if (!srcFilePath) {
+      throw new Error("No source file found");
+    }
 
     const file = await vscode.workspace.openTextDocument(srcFilePath);
     console.log("generate : file.getText():", file.getText());
