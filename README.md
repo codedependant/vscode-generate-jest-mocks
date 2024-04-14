@@ -2,6 +2,8 @@
 
 Automatically generate Jest mocks for your Javascript/Typescript files based on module usage.
 
+![](https://github.com/codedependant/vscode-generate-jest-mocks/demo.gif)
+
 ## Features
 
 Consider the following file named `create_user.js`:
