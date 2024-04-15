@@ -13,7 +13,7 @@
   "author": "Che` Nxusani",
   "publisher": "codedependant",
   "license": "SEE LICENSE IN LICENSE",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.88.0"
   },
