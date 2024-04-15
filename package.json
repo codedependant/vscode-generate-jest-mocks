@@ -2,6 +2,7 @@
   "name": "generate-jest-mocks",
   "displayName": "generate-jest-mocks",
   "description": "Automatically generate Jest mocks for your Javascript/Typescript files based on module usage.",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "git@github.com:codedependant/vscode-generate-jest-mocks.git"
