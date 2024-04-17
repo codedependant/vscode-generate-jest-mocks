@@ -2,7 +2,7 @@
 
 Automatically generate Jest mocks for your Javascript/Typescript files based on module usage.
 
-![Demo](https://github.com/codedependant/vscode-generate-jest-mocks/blob/main/demo.gif)
+![Demo](https://raw.githubusercontent.com/codedependant/vscode-generate-jest-mocks/main/demo.gif)
 
 ## Features
 
